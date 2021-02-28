@@ -10,21 +10,29 @@ except:
     from basketball_reference_scraper.lookup import lookup
 
 
-def get_connard_suffix(connards_suffixes, connard_name):
-    if connard_name in connards_suffixes.keys():
-        suffix = connards_suffixes[connard_name]
+def get_special_suffix(suffixes, player_name):
+    if player_name in suffixes.keys():
+        suffix = suffixes[player_name]
+
         return "/players/c/" + suffix + ".html"
+
     return None
 
 
-def get_stats(_name, stat_type='PER_GAME', playoffs=False, career=False, connards_suffixes=None):
+def get_suffix(suffixes, player_name):
+    special_suffix = get_special_suffix(suffixes, player_name)
+
+    if special_suffix is None:
+        suffix = get_player_suffix(player_name)
+    else:
+        suffix = special_suffix
+
+    return suffix.replace('/', '%2F')
+
+
+def get_stats(_name, stat_type='PER_GAME', playoffs=False, career=False, suffixes=None):
     name = lookup(_name)
-
-    suffix = get_connard_suffix(connards_suffixes, name)
-    if suffix is None:
-        suffix = get_player_suffix(name)
-    suffix = suffix.replace('/', '%2F')
-
+    suffix = get_suffix(suffixes, name)
     selector = stat_type.lower()
     if playoffs:
         selector = 'playoffs_'+selector
